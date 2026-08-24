@@ -1,70 +1,83 @@
-import java.text.NumberFormat;
+import java.time.LocalDate;
+//definição da classe
+class Produto {
+private static final double margemPadrao =0.2;
+public String descricao;
+public double precoCusto;
+public double margemLucro;
 
-public class Produto {
-	
-	private static final double MARGEM_PADRAO = 0.2;
-	private String descricao;
-	private double precoCusto;
-	private double margemLucro;
-	
-	/**
-     * Inicializador privado. Os valores default, em caso de erro, são:
-     * "Produto sem descrição", R$ 0.00, 0.0  
-     * @param desc Descrição do produto (mínimo de 3 caracteres)
-     * @param precoCusto Preço do produto (mínimo 0.01)
-     * @param margemLucro Margem de lucro (mínimo 0.01)
-     */
-	private void init(String desc, double precoCusto, double margemLucro) {
+
+
+//inicializador
+private void init(String descricao,double precoCusto,double margemLucro){
+	if(descricao.length()> 3 && precoCusto > 0 && margemLucro > 0){
+		this.descricao = descricao;
+		this.precoCusto = precoCusto;
+		this.margemLucro = margemLucro;
 		
-		if ((desc.length() >= 3) && (precoCusto > 0.0) && (margemLucro > 0.0)) {
-			this.descricao = desc;
-			this.precoCusto = precoCusto;
-			this.margemLucro = margemLucro;
-		} else {
-			throw new IllegalArgumentException("Valores inválidos para os dados do produto.");
+	}
+else{
+		throw new IllegalArgumentException("Valores inválidos.");
+}
+}
+
+//construtor com margem de lucro informada
+public Produto (String descricao,Double precoCusto,Double margemLucro){
+	init(descricao,precoCusto,margemLucro);
+
+
+}
+
+//construtor sem margem de lucro informada
+public Produto (String descricao,Double precoCusto,LocalDate dataValidade,double valorVenda){
+	init(descricao,precoCusto,margemPadrao);
+
+
+}
+
+
+}
+class ProdutoPerecivel extends Produto{
+
+	private static final double desconto = 0.25;
+	LocalDate dataValidade;
+	double valorVenda;
+	
+		//inicializador apenas com os parametros da classe Produto(pai)
+		public ProdutoPerecivel(String descricao,Double precoCusto,Double margemLucro,LocalDate dataValidade,double valorVenda){
+				super(descricao,precoCusto,margemLucro);
+
+			//recebimentos da classe herdada
+
+			//calcula o valor da venda com base no custo*margem de lucro
+			this.valorVenda = precoCusto = (precoCusto*margemLucro);
+
+			//verifica se a data de validade é antes do dia atual
+			 if(dataValidade.isBefore(LocalDate.now())){
+					this.dataValidade = dataValidade;
+
+					//verifica se está a 7 dias do vencimento, se sim dá desconto
+					if(LocalDate.now().compareTo(dataValidade)>7){
+			 			valorVenda=valorVenda/desconto;
+
 		}
+			 }
+			
+			
 	}
-	
-	/**
-     * Construtor completo. Os valores default, em caso de erro, são:
-     * "Produto sem descrição", R$ 0.00, 0.0  
-     * @param desc Descrição do produto (mínimo de 3 caracteres)
-     * @param precoCusto Preço do produto (mínimo 0.01)
-     * @param margemLucro Margem de lucro (mínimo 0.01)
-     */
-	public Produto(String desc, double precoCusto, double margemLucro) {
-		init(desc, precoCusto, margemLucro);
-	}
-	
-	/**
-     * Construtor sem margem de lucro - fica considerado o valor padrão de margem de lucro.
-     * Os valores default, em caso de erro, são:
-     * "Produto sem descrição", R$ 0.00 
-     * @param desc Descrição do produto (mínimo de 3 caracteres)
-     * @param precoCusto Preço do produto (mínimo 0.01)
-     */
-	public Produto(String desc, double precoCusto) {
-		init(desc, precoCusto, MARGEM_PADRAO);
-	}
-	
-	 /**
-     * Retorna o valor de venda do produto, considerando seu preço de custo e margem de lucro.
-     * @return Valor de venda do produto (double, positivo)
-     */
-	public double valorDeVenda() {
-		return (precoCusto * (1.0 + margemLucro));
-	}
-	
-	/**
-     * Descrição, em string, do produto, contendo sua descrição e o valor de venda.
-     *  @return String com o formato:
-     * [NOME]: R$ [VALOR DE VENDA]
-     */
-    @Override
-	public String toString() {
-    	
-    	NumberFormat moeda = NumberFormat.getCurrencyInstance();
-    	
-		return String.format("NOME: " + descricao + ": " + moeda.format(valorDeVenda()));
-	}
+}
+
+class ProdutoNaoPerecivel extends Produto{
+		double valorVenda;
+
+		public ProdutoNaoPerecivel(String descricao,Double precoCusto,Double margemLucro,LocalDate dataValidade,double valorVenda){
+				super(descricao,precoCusto,margemLucro);
+
+			//recebimentos da classe herdada
+
+			//calcula o valor da venda com base no custo*margem de lucro
+			this.valorVenda = precoCusto = (precoCusto*margemLucro);
+
+
+}
 }
